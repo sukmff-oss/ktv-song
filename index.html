@@ -161,6 +161,8 @@ let isPlaying = false;
 let currentPlaylist = [...PLAYLIST];
 let currentIndex = 0;
 let lyricTimer = null;
+let playStartTime = 0;   // performance.now() when playback started
+let playStartVideoTime = 0; // video time when playback started
 let micStream = null;
 let micAnalyser = null;
 let micDataArray = null;
@@ -219,6 +221,8 @@ function onPlayerError(event) {
 function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     isPlaying = true;
+    playStartTime = performance.now();
+    try { playStartVideoTime = player.getCurrentTime(); } catch(e) { playStartVideoTime = 0; }
     document.getElementById('btn-play').textContent = '⏸';
   } else if (event.data === YT.PlayerState.PAUSED) {
     isPlaying = false;
@@ -243,6 +247,8 @@ function replayVideo() {
   if (!player) return;
   player.seekTo(0);
   player.playVideo();
+  playStartTime = performance.now();
+  playStartVideoTime = 0;
 }
 
 // ====== 歌詞同步 ======
@@ -250,17 +256,18 @@ function startLyricSync() {
   if (lyricTimer) clearInterval(lyricTimer);
   
   lyricTimer = setInterval(() => {
-    if (!player || !currentSong || !isPlaying) return;
+    if (!currentSong || !isPlaying) return;
     
-    const currentTime = player.getCurrentTime();
+    // 用 performance.now() 自己計時
+    const elapsed = (performance.now() - playStartTime) / 1000 + playStartVideoTime;
     const lyrics = currentSong.lyric;
     
     // 每行歌詞約4秒
     const lineDuration = 4;
-    const activeIndex = Math.min(Math.floor(currentTime / lineDuration), lyrics.length - 1);
+    const activeIndex = Math.min(Math.floor(elapsed / lineDuration), lyrics.length - 1);
     
     updateLyricHighlight(activeIndex);
-  }, 200);
+  }, 250);
 }
 
 function updateLyricHighlight(index) {
