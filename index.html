@@ -377,6 +377,11 @@ function renderLyrics(lyrics) {
 function playSong(song, index) {
   currentSong = song;
   currentIndex = index;
+  isPlaying = false;
+  playStartTime = 0;
+  playStartVideoTime = 0;
+  if (lyricTimer) clearInterval(lyricTimer);
+  document.getElementById('btn-play').textContent = '▶';
   
   document.getElementById('ktv-title').textContent = song.title;
   document.getElementById('ktv-artist').textContent = song.artist;
