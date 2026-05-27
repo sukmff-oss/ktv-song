@@ -144,214 +144,14 @@ h2{font-size:20px;margin:15px 0 10px;color:#e0aaff}
 <script>
 // ====== 資料 ======
 const PLAYLIST = [
-  {
-    title:"說好不哭",
-    artist:"周杰倫/阿妹",
-    lang:"國語",
-    youtubeId:"HK7SPnGSxLM",
-    lyric:[
-      "說好不哭 - 周杰倫/阿妹",
-      "",
-      "看著你白色的裙子和紅色的針",
-      "想起你被我吵醒的凌晨",
-      "",
-      "我突然卻步 其實不是不能夠",
-      "只是怕你看見我眼眶中泛紅",
-      "",
-      "說好不哭 我不會讓你看到",
-      "臉頰上 慢慢滑落的雨",
-      "",
-      "說好不哭 我不能讓你看到",
-      "眼眶中 受傷的痕跡",
-      "",
-      "你會不會遺忘 我的模樣",
-      "轉身離開時 別帶走太陽",
-      "",
-      "說好不哭 我不會讓你看到",
-      "臉頰上 慢慢滑落的雨",
-      "",
-      "說好不哭 我不能讓你看到",
-      "眼眶中 最後的模樣"
-    ],
-    duration:244
-  },
-  {
-    title:"終結孤單",
-    artist:"告五人",
-    lang:"國語",
-    youtubeId:"UNM2Hgag8Ag",
-    lyric:[
-      "終結孤單 - 告五人",
-      "",
-      "光是你們的存在 就足以照亮黑暗",
-      "讓我把孤單 終結在今天晚上",
-      "",
-      "再多的抱怨 我都願意說給你聽",
-      "只要你願意 陪我走這一段",
-      "",
-      "我們是彼此的答案",
-      "在這個善變的世界裡",
-      "誰比誰更勇敢",
-      "",
-      "終結孤單 從今晚開始",
-      "拋開所有煩惱 和悲傷",
-      "",
-      "終結孤單 從今晚開始",
-      "世界再壞 也不孤單"
-    ],
-    duration:270
-  },
-  {
-    title:"刻在我心底的名字",
-    artist:"盧廣仲",
-    lang:"國語",
-    youtubeId:"m78lJuzftcc",
-    lyric:[
-      "刻在我心底的名字 - 盧廣仲",
-      "",
-      "如果說 相遇是意外",
-      "那相戀 是否是命運的安排",
-      "",
-      "你刻在我心底的名字",
-      "時間沖淡了 卻不曾消失",
-      "",
-      "有種特別的感覺",
-      "就算世界崩塌也不後悔",
-      "刻在心底的名字",
-      "",
-      "風吹過 你的臉",
-      "陽光照亮了我們的夏天",
-      "",
-      "刻在我心底的名字",
-      "是我這輩子 最美的遇見"
-    ],
-    duration:278
-  },
-  {
-    title:"因為我們在一起",
-    artist:"黃小愛",
-    lang:"國語",
-    youtubeId:"4mLZTxpPjAQ",
-    lyric:[
-      "因為我們在一起 - 黃小愛",
-      "",
-      "抬頭看看天空 星星都在閃",
-      "因為我們在一起",
-      "",
-      "不管明天會怎樣",
-      "至少今天 我們在一起",
-      "",
-      "所有的困難",
-      "都因為你 而變得簡單",
-      "",
-      "因為我們在一起",
-      "每一刻 都是最美麗",
-      "",
-      "握緊我的手",
-      "我們一起往前走"
-    ],
-    duration:213
-  },
-  {
-    title:"達爾文",
-    artist:"黃小愛",
-    lang:"國語",
-    youtubeId:"7i1g3XqfObA",
-    lyric:[
-      "達爾文 - 黃小愛",
-      "",
-      "愛情的規則 適者生存",
-      "我們都在學習 如何愛人",
-      "",
-      "如果有一天 我們不適合",
-      "也許只是 我們都在演變",
-      "",
-      "進化論 說的是改變",
-      "但我的心 不會改變",
-      "",
-      "愛情的路上 我們都是初學者",
-      "達爾文也沒有答案",
-      "",
-      "讓我們 慢慢來",
-      "學習彼此最好的版本"
-    ],
-    duration:254
-  },
-  {
-    title:"答應你",
-    artist:"張震嶽",
-    lang:"國語",
-    youtubeId:"_VCU94B_Oig",
-    lyric:[
-      "答應你 - 張震嶽",
-      "",
-      "答應你 要快樂一點",
-      "不要再為我而失眠",
-      "",
-      "答應你 好好照顧自己",
-      "不管未來會怎樣",
-      "",
-      "也許有一天 我們會再見",
-      "那時的我 會不會改變",
-      "",
-      "答應你 我會記得這一切",
-      "在我心裡 最深的地方",
-      "",
-      "離開是為讓彼此自由",
-      "但承諾永遠不會消失"
-    ],
-    duration:289
-  },
-  {
-    title:"挪威的森林",
-    artist:"伍佰",
-    lang:"台語",
-    youtubeId:"gPpZJlE0Ca8",
-    lyric:[
-      "挪威的森林 - 伍佰",
-      "",
-      "讓我將你心兒摘下",
-      "慢慢將它融化",
-      "",
-      "它在等我 給它一個擁抱",
-      "我卻遲遲不敢伸手",
-      "",
-      "挪威的森林 充滿了寂寞",
-      "我的孤獨 你不懂",
-      "",
-      "愛情的森林 走不出去",
-      "只剩回憶 和眼淚",
-      "",
-      "讓我將你摘下",
-      "永遠永遠 放在心裡"
-    ],
-    duration:315
-  },
-  {
-    title:"你是我的眼",
-    artist:"蕭煌奇",
-    lang:"國語",
-    youtubeId:"X1mAQeVKqPg",
-    lyric:[
-      "你是我的眼 - 蕭煌奇",
-      "",
-      "你是我的眼 帶我穿越擁擠的人潮",
-      "你是我的眼 讓我看見這世界",
-      "",
-      "因為你是我的眼",
-      "讓我看到 顏色的美麗",
-      "",
-      "如果我能看得見",
-      "就能輕易地分辨 白天和黑夜",
-      "",
-      "你是我的眼",
-      "讓我生命有了焦點",
-      "",
-      "謝謝你一直陪在我身邊",
-      "做我的眼 讓我不再害怕黑暗"
-    ],
-    duration:283
-  }
+  {title:"說好不哭", artist:"周杰倫/阿妹", lang:"國語", youtubeId:"HK7SPnGSxLM", lyric:["說好不哭 - 周杰倫/阿妹","","看著你白色的裙子和紅色的針","想起你被我吵醒的凌晨","","我突然卻步 其實不是不能夠","只是怕你看見我眼眶中泛紅","","說好不哭 我不會讓你看到","臉頰上 慢慢滑落的雨","","說好不哭 我不能讓你看到","眼眶中 受傷的痕跡","","你會不會遺忘 我的模樣","轉身離開時 別帶走太陽","","說好不哭 我不會讓你看到","臉頰上 慢慢滑落的雨","","說好不哭 我不能讓你看到","眼眶中 最後的模樣"], duration:244},
+  {title:"終結孤單", artist:"告五人", lang:"國語", youtubeId:"UNM2Hgag8Ag", lyric:["終結孤單 - 告五人","","光是你們的存在 就足以照亮黑暗","讓我把孤單 終結在今天晚上","","再多的抱怨 我都願意說給你聽","只要你願意 陪我走這一段","","我們是彼此的答案","在這個善變的世界裡","誰比誰更勇敢","","終結孤單 從今晚開始","拋開所有煩惱 和悲傷","","終結孤單 從今晚開始","世界再壞 也不孤單"], duration:270},
+  {title:"刻在我心底的名字", artist:"盧廣仲", lang:"國語", youtubeId:"m78lJuzftcc", lyric:["刻在我心底的名字 - 盧廣仲","","如果說 相遇是意外","那相戀 是否是命運的安排","","你刻在我心底的名字","時間沖淡了 卻不曾消失","","有種特別的感覺","就算世界崩塌也不後悔","刻在心底的名字","","風吹過 你的臉","陽光照亮了我們的夏天","","刻在我心底的名字","是我這輩子 最美的遇見"], duration:278},
+  {title:"因為我們在一起", artist:"黃小愛", lang:"國語", youtubeId:"", lyric:["（請自行前往 YouTube 搜尋「因為我們在一起 黃小愛」）","","抬頭看看天空 星星都在閃","因為我們在一起","","不管明天會怎樣","至少今天 我們在一起","","所有的困難","都因為你 而變得簡單","","因為我們在一起","每一刻 都是最美麗","","握緊我的手","我們一起往前走"], duration:213},
+  {title:"達爾文", artist:"黃小愛", lang:"國語", youtubeId:"", lyric:["（請自行前往 YouTube 搜尋「達爾文 黃小愛」）","","愛情的規則 適者生存","我們都在學習 如何愛人","","如果有一天 我們不適合","也許只是 我們都在演變","","進化論 說的是改變","但我的心 不會改變","","我們都在改變","但愛是不變的語言","","達爾文 說的是演化","我說的是 永恆的愛"], duration:254},
+  {title:"答應你", artist:"張震嶽", lang:"國語", youtubeId:"", lyric:["（請自行前往 YouTube 搜尋「答應你 張震嶽 歌詞版」）","","我答應你 不再讓你流淚","我答應你 每天都更快樂","","不管未來有多少困難","只要有你 我就不害怕","","答應你的事 我一定做到","這是我對你 永遠的承諾","","風雨再大 我也會保護你","因為你是我 最重要的人"], duration:289},
+  {title:"挪威的森林", artist:"伍佰", lang:"國語", youtubeId:"gPpZJlE0Ca8", lyric:["挪威的森林 - 伍佰","","曾經在這裡 我遇見了你","那是很久以前的事","","挪威的森林 靜靜的森林","那裡有我們 年輕的足跡","","你的身影 離開的決定","我看著你 走進森林深處","","挪威的森林 那片孤獨的森林","你說你會 等我在那裡","","多年後 我再次來到這裡","森林還在 你已不在"], duration:315},
+  {title:"你是我的眼", artist:"蕭煌奇", lang:"國境", youtubeId:"X1mAQeVKqPg", lyric:["你是我的眼 - 蕭煌奇","","我看見 這世界的美麗","是因為有你在我身邊","","如果我能 看見陽光","那是因為 你讓我看見","","你是我的眼 帶我穿越黑暗","你是我的眼 讓我看見星光","","有你在身邊 我不再迷惘","有你在身邊 我看見方向","","謝謝你 成為我的眼睛","帶我看到 這世界的溫柔"], duration:283},
 ];
 
 // ====== 狀態 ======
@@ -397,7 +197,8 @@ function initPlayer(videoId) {
     },
     events: {
       onReady: onPlayerReady,
-      onStateChange: onPlayerStateChange
+      onStateChange: onPlayerStateChange,
+      onError: onPlayerError
     }
   });
 }
@@ -405,6 +206,14 @@ function initPlayer(videoId) {
 function onPlayerReady(event) {
   event.target.setVolume(80);
   startLyricSync();
+}
+
+function onPlayerError(event) {
+  // Embed blocked - show direct YouTube link
+  if (currentSong && currentSong.youtubeId) {
+    const watchUrl = 'https://www.youtube.com/watch?v=' + currentSong.youtubeId;
+    document.getElementById('yt-player').innerHTML = '<div style="text-align:center;padding:40px 20px;background:rgba(255,50,50,0.1);border-radius:16px;margin:20px;"><div style="font-size:40px;margin-bottom:12px;">⚠️</div><div style="font-size:16px;margin-bottom:16px;">此影片不支援外部播放</div><a href="' + watchUrl + '" target="_blank" style="display:inline-block;padding:12px 28px;background:#ff4444;color:#fff;text-decoration:none;border-radius:25px;font-size:15px;font-weight:bold;">▶ 前往 YouTube 播放</a></div>';
+  }
 }
 
 function onPlayerStateChange(event) {
@@ -567,7 +376,12 @@ function playSong(song, index) {
   
   renderLyrics(song.lyric);
   
-  initPlayer(song.youtubeId);
+  if (!song.youtubeId) {
+    document.getElementById('yt-player').innerHTML = '<div style="text-align:center;padding:30px 20px;color:rgba(255,255,255,0.4);"><div style="font-size:36px;margin-bottom:10px;">🎤</div><div style="font-size:14px;">此歌曲尚無伴奏影片</div><div style="font-size:12px;margin-top:6px;">請使用上一首/下一首切換</div></div>';
+  } else {
+    document.getElementById('yt-player').innerHTML = '';
+    initPlayer(song.youtubeId);
+  }
   showPage('ktv-page');
   
   // 停止之前的麥克風
