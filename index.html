@@ -589,7 +589,7 @@ function playPrev() {
 // ====== 搜尋功能 ======
 async function searchYouTube(keyword) {
   // 使用真實的 Google Data API v3 key（示範用）
-  const API_KEY = 'AIzaSyAOES8Hd7v0fR3bL4q1IZ7tY2Z9xLk7mQw';
+  const API_KEY = 'project-b57b400b-0b61-499f-acf';
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(keyword + ' 歌詞版')}&maxResults=5&key=${API_KEY}`;
   
   try {
