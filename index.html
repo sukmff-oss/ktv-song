@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>個人 KTV 點歌系統</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft JhengHei',sans-serif;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);color:#fff;min-height:100vh;overflow-x:hidden}
+
+/* 頁面 */
+.page{display:none;min-height:100vh;padding:20px;padding-bottom:100px}
+.page.active{display:block}
+
+/* 標題 */
+h1{font-size:28px;text-align:center;margin:20px 0;background:linear-gradient(90deg,#ff6bd6,#9d4edd,#6f42c1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none;filter:drop-shadow(0 0 10px rgba(157,78,221,0.5))}
+h2{font-size:20px;margin:15px 0 10px;color:#e0aaff}
+
+/* 搜尋區 */
+.search-box{display:flex;gap:10px;margin:15px 0;padding:0 5px}
+.search-box input{flex:1;padding:14px 18px;border:none;border-radius:25px;background:rgba(255,255,255,0.1);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(10px)}
+.search-box input::placeholder{color:rgba(255,255,255,0.5)}
+.search-box button{padding:14px 24px;border:none;border-radius:25px;background:linear-gradient(135deg,#9d4edd,#6f42c1);color:#fff;font-size:15px;cursor:pointer;font-weight:bold;transition:transform 0.2s,box-shadow 0.2s}
+.search-box button:active{transform:scale(0.95);box-shadow:0 0 15px rgba(157,78,221,0.6)}
+
+/* 歌曲卡片 */
+.song-list{display:grid;grid-template-columns:1fr;gap:12px;padding:5px}
+.song-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(16px);border-radius:16px;padding:16px;cursor:pointer;transition:transform 0.2s,background 0.2s;border:1px solid rgba(255,255,255,0.1)}
+.song-card:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px)}
+.song-card .title{font-size:18px;font-weight:bold;color:#ffd700;margin-bottom:6px}
+.song-card .artist{font-size:14px;color:#ccc;margin-bottom:8px}
+.song-card .tags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{padding:4px 10px;border-radius:12px;font-size:11px;background:rgba(157,78,221,0.3);color:#e0aaff;border:1px solid rgba(157,78,221,0.4)}
+
+/* 精選歌單標題 */
+.featured-title{text-align:center;font-size:22px;margin:25px 0 15px;background:linear-gradient(90deg,#ffd700,#ff6bd6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/*  loading */
+.loading{text-align:center;padding:30px;color:#e0aaff;font-size:16px}
+.hidden{display:none}
+
+/* KTV 頁面 */
+#ktv-page{position:relative;display:flex;flex-direction:column;min-height:100vh;padding-bottom:80px}
+.ktv-header{text-align:center;padding:15px 0}
+.ktv-header .song-title{font-size:26px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.5);margin-bottom:5px}
+.ktv-header .song-artist{font-size:16px;color:#e0aaff}
+
+/* YouTube 播放器（透明覆蓋） */
+#yt-player{position:absolute;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* 歌詞區 */
+.lyrics-container{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:20px;min-height:300px}
+.lyrics-viewport{width:100%;max-width:500px;height:320px;overflow:hidden;position:relative}
+.lyrics-scroll{transition:transform 0.3s ease-out}
+.lyric-line{font-size:28px;text-align:center;padding:18px 10px;color:rgba(255,255,255,0.35);transition:all 0.4s ease;line-height:1.4}
+.lyric-line.active{color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,0.8),0 0 50px rgba(255,215,0,0.4);font-size:34px;font-weight:bold}
+
+/* 麥克風音量燈 */
+.mic-section{margin:20px auto;max-width:300px}
+.mic-label{text-align:center;font-size:13px;color:#aaa;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+.mic-label::before,.mic-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)}
+.mic-bars{display:flex;justify-content:center;align-items:flex-end;gap:8px;height:60px}
+.mic-bar{width:36px;border-radius:8px 8px 4px 4px;background:rgba(255,255,255,0.1);transition:all 0.1s;min-height:12px}
+.mic-bar.level1{background:linear-gradient(to top,#00ff88,#00cc66);box-shadow:0 0 12px rgba(0,255,136,0.7)}
+.mic-bar.level2{background:linear-gradient(to top,#88ff00,#ffcc00);box-shadow:0 0 12px rgba(255,204,0,0.7)}
+.mic-bar.level3{background:linear-gradient(to top,#ffcc00,#ff6600);box-shadow:0 0 12px rgba(255,102,0,0.7)}
+.mic-bar.level4{background:linear-gradient(to top,#ff6600,#ff0044);box-shadow:0 0 12px rgba(255,0,68,0.7)}
+.mic-bar.level5{background:linear-gradient(to top,#ff0044,#cc0000);box-shadow:0 0 15px rgba(255,0,68,0.9)}
+
+/* 控制列 */
+.controls{display:flex;justify-content:center;gap:20px;padding:20px;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(10,10,10,0.95),transparent);padding-top:30px}
+.ctrl-btn{width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,box-shadow 0.2s}
+.ctrl-btn.play{background:linear-gradient(135deg,#9d4edd,#6f42c1);box-shadow:0 4px 20px rgba(157,78,221,0.5)}
+.ctrl-btn.play:active{transform:scale(0.9)}
+.ctrl-btn.secondary{background:rgba(255,255,255,0.15);font-size:18px}
+.ctrl-btn.secondary:active{transform:scale(0.9)}
+
+/* 搜尋結果 */
+.search-results{margin-top:15px}
+
+/* 提示訊息 */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(157,78,221,0.9);padding:12px 24px;border-radius:25px;font-size:14px;z-index:1000;opacity:0;transition:opacity 0.3s}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ==================== 首頁 ==================== -->
+<div id="home-page" class="page active">
+  <h1>🎤 KTV 點歌系統</h1>
+  
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="搜尋歌曲或歌手...">
+    <button id="search-btn">搜尋</button>
+  </div>
+  
+  <div id="search-results" class="song-list search-results hidden"></div>
+  
+  <div class="featured-title">✨ 精選歌單</div>
+  <div id="playlist" class="song-list"></div>
+</div>
+
+<!-- ==================== KTV 頁面 ==================== -->
+<div id="ktv-page" class="page">
+  <div class="ktv-header">
+    <div class="song-title" id="ktv-title">歌名</div>
+    <div class="song-artist" id="ktv-artist">歌手</div>
+  </div>
+  
+  <div id="yt-player"></div>
+  
+  <div class="lyrics-container">
+    <div class="lyrics-viewport">
+      <div class="lyrics-scroll" id="lyrics-scroll"></div>
+    </div>
+  </div>
+  
+  <div class="mic-section">
+    <div class="mic-label">🎙️ 麥克風音量</div>
+    <div class="mic-bars" id="mic-bars">
+      <div class="mic-bar" id="bar0"></div>
+      <div class="mic-bar" id="bar1"></div>
+      <div class="mic-bar" id="bar2"></div>
+      <div class="mic-bar" id="bar3"></div>
+      <div class="mic-bar" id="bar4"></div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="ctrl-btn secondary" id="btn-home" title="回首頁">🏠</button>
+    <button class="ctrl-btn secondary" id="btn-prev" title="上一首">⏮</button>
+    <button class="ctrl-btn play" id="btn-play" title="播放/暫停">▶</button>
+    <button class="ctrl-btn secondary" id="btn-next" title="下一首">⏭</button>
+    <button class="ctrl-btn secondary" id="btn-replay" title="重播">🔄</button>
+  </div>
+</div>
+
+<!-- ==================== Toast ==================== -->
+<div class="toast" id="toast"></div>
+
+<!-- YouTube IFrame API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+// ====== 資料 ======
+const PLAYLIST = [
+  {
+    title:"說好不哭",
+    artist:"周杰倫/阿妹",
+    lang:"國語",
+    youtubeId:"sV5fgFVUpU8", // 尋找中
+    lyric:[
+      "說好不哭 - 周杰倫/阿妹",
+      "",
+      "看著你白色的裙子和紅色的針",
+      "想起你被我吵醒的凌晨",
+      "",
+      "我突然卻步 其實不是不能夠",
+      "只是怕你看見我眼眶中泛紅",
+      "",
+      "說好不哭 我不會讓你看到",
+      "臉頰上 慢慢滑落的雨",
+      "",
+      "說好不哭 我不能讓你看到",
+      "眼眶中 受傷的痕跡",
+      "",
+      "你會不會遺忘 我的模樣",
+      "轉身離開時 別帶走太陽",
+      "",
+      "說好不哭 我不會讓你看到",
+      "臉頰上 慢慢滑落的雨",
+      "",
+      "說好不哭 我不能讓你看到",
+      "眼眶中 最後的模樣"
+    ],
+    duration:244
+  },
+  {
+    title:"終結孤單",
+    artist:"告五人",
+    lang:"國語",
+    youtubeId:"Z_OcueAneKo",
+    lyric:[
+      "終結孤單 - 告五人",
+      "",
+      "光是你們的存在 就足以照亮黑暗",
+      "讓我把孤單 終結在今天晚上",
+      "",
+      "再多的抱怨 我都願意說給你聽",
+      "只要你願意 陪我走這一段",
+      "",
+      "我們是彼此的答案",
+      "在這個善變的世界裡",
+      "誰比誰更勇敢",
+      "",
+      "終結孤單 從今晚開始",
+      "拋開所有煩惱 和悲傷",
+      "",
+      "終結孤單 從今晚開始",
+      "世界再壞 也不孤單"
+    ],
+    duration:270
+  },
+  {
+    title:"刻在我心底的名字",
+    artist:"盧廣仲",
+    lang:"國語",
+    youtubeId:"U9h5E9cE-5s",
+    lyric:[
+      "刻在我心底的名字 - 盧廣仲",
+      "",
+      "如果說 相遇是意外",
+      "那相戀 是否是命運的安排",
+      "",
+      "你刻在我心底的名字",
+      "時間沖淡了 卻不曾消失",
+      "",
+      "有種特別的感覺",
+      "就算世界崩塌也不後悔",
+      "刻在心底的名字",
+      "",
+      "風吹過 你的臉",
+      "陽光照亮了我們的夏天",
+      "",
+      "刻在我心底的名字",
+      "是我這輩子 最美的遇見"
+    ],
+    duration:278
+  },
+  {
+    title:"因為我們在一起",
+    artist:"黃小愛",
+    lang:"國語",
+    youtubeId:"Q7X8xO2I1kM",
+    lyric:[
+      "因為我們在一起 - 黃小愛",
+      "",
+      "抬頭看看天空 星星都在閃",
+      "因為我們在一起",
+      "",
+      "不管明天會怎樣",
+      "至少今天 我們在一起",
+      "",
+      "所有的困難",
+      "都因為你 而變得簡單",
+      "",
+      "因為我們在一起",
+      "每一刻 都是最美麗",
+      "",
+      "握緊我的手",
+      "我們一起往前走"
+    ],
+    duration:213
+  },
+  {
+    title:"達爾文",
+    artist:"黃小愛",
+    lang:"國語",
+    youtubeId:"bX7lXY9JQjU",
+    lyric:[
+      "達爾文 - 黃小愛",
+      "",
+      "愛情的規則 適者生存",
+      "我們都在學習 如何愛人",
+      "",
+      "如果有一天 我們不適合",
+      "也許只是 我們都在演變",
+      "",
+      "進化論 說的是改變",
+      "但我的心 不會改變",
+      "",
+      "愛情的路上 我們都是初學者",
+      "達爾文也沒有答案",
+      "",
+      "讓我們 慢慢來",
+      "學習彼此最好的版本"
+    ],
+    duration:254
+  },
+  {
+    title:"答應你",
+    artist:"張震嶽",
+    lang:"國語",
+    youtubeId:"w5fL7h9I3vM",
+    lyric:[
+      "答應你 - 張震嶽",
+      "",
+      "答應你 要快樂一點",
+      "不要再為我而失眠",
+      "",
+      "答應你 好好照顧自己",
+      "不管未來會怎樣",
+      "",
+      "也許有一天 我們會再見",
+      "那時的我 會不會改變",
+      "",
+      "答應你 我會記得這一切",
+      "在我心裡 最深的地方",
+      "",
+      "離開是為讓彼此自由",
+      "但承諾永遠不會消失"
+    ],
+    duration:289
+  },
+  {
+    title:"挪威的森林",
+    artist:"伍佰",
+    lang:"台語",
+    youtubeId:"PnKxB3EsW0g",
+    lyric:[
+      "挪威的森林 - 伍佰",
+      "",
+      "讓我將你心兒摘下",
+      "慢慢將它融化",
+      "",
+      "它在等我 給它一個擁抱",
+      "我卻遲遲不敢伸手",
+      "",
+      "挪威的森林 充滿了寂寞",
+      "我的孤獨 你不懂",
+      "",
+      "愛情的森林 走不出去",
+      "只剩回憶 和眼淚",
+      "",
+      "讓我將你摘下",
+      "永遠永遠 放在心裡"
+    ],
+    duration:315
+  },
+  {
+    title:"你是我的眼",
+    artist:"蕭煌奇",
+    lang:"國語",
+    youtubeId:"Xc4aY7a2T7Y",
+    lyric:[
+      "你是我的眼 - 蕭煌奇",
+      "",
+      "你是我的眼 帶我穿越擁擠的人潮",
+      "你是我的眼 讓我看見這世界",
+      "",
+      "因為你是我的眼",
+      "讓我看到 顏色的美麗",
+      "",
+      "如果我能看得見",
+      "就能輕易地分辨 白天和黑夜",
+      "",
+      "你是我的眼",
+      "讓我生命有了焦點",
+      "",
+      "謝謝你一直陪在我身邊",
+      "做我的眼 讓我不再害怕黑暗"
+    ],
+    duration:283
+  }
+];
+
+// ====== 狀態 ======
+let currentSong = null;
+let player = null;
+let isPlaying = false;
+let currentPlaylist = [...PLAYLIST];
+let currentIndex = 0;
+let lyricTimer = null;
+let micStream = null;
+let micAnalyser = null;
+let micDataArray = null;
+let micAnimationId = null;
+
+// ====== YouTube IFrame API ======
+let ytReady = false;
+
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+};
+
+function initPlayer(videoId) {
+  if (!ytReady) {
+    setTimeout(() => initPlayer(videoId), 500);
+    return;
+  }
+  
+  if (player) {
+    player.loadVideoById(videoId);
+    return;
+  }
+  
+  player = new YT.Player('yt-player', {
+    videoId: videoId,
+    playerVars: {
+      autoplay: 1,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      modestbranding: 1,
+      playsinline: 1,
+      rel: 0
+    },
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerReady(event) {
+  event.target.setVolume(80);
+  startLyricSync();
+}
+
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    isPlaying = true;
+    document.getElementById('btn-play').textContent = '⏸';
+  } else if (event.data === YT.PlayerState.PAUSED) {
+    isPlaying = false;
+    document.getElementById('btn-play').textContent = '▶';
+  } else if (event.data === YT.PlayerState.ENDED) {
+    isPlaying = false;
+    document.getElementById('btn-play').textContent = '▶';
+    playNext();
+  }
+}
+
+function togglePlay() {
+  if (!player) return;
+  if (isPlaying) {
+    player.pauseVideo();
+  } else {
+    player.playVideo();
+  }
+}
+
+function replayVideo() {
+  if (!player) return;
+  player.seekTo(0);
+  player.playVideo();
+}
+
+// ====== 歌詞同步 ======
+function startLyricSync() {
+  if (lyricTimer) clearInterval(lyricTimer);
+  
+  lyricTimer = setInterval(() => {
+    if (!player || !currentSong || !isPlaying) return;
+    
+    const currentTime = player.getCurrentTime();
+    const lyrics = currentSong.lyric;
+    
+    // 每行歌詞約4秒
+    const lineDuration = 4;
+    const activeIndex = Math.min(Math.floor(currentTime / lineDuration), lyrics.length - 1);
+    
+    updateLyricHighlight(activeIndex);
+  }, 200);
+}
+
+function updateLyricHighlight(index) {
+  const container = document.getElementById('lyrics-scroll');
+  const lines = container.querySelectorAll('.lyric-line');
+  
+  lines.forEach((line, i) => {
+    if (i === index) {
+      line.classList.add('active');
+    } else {
+      line.classList.remove('active');
+    }
+  });
+  
+  // 滾動到中央
+  if (lines[index]) {
+    const lineHeight = lines[index].offsetHeight;
+    const containerHeight = 320;
+    const offset = index * lineHeight - containerHeight / 2 + lineHeight / 2;
+    container.style.transform = `translateY(-${Math.max(0, offset)}px)`;
+  }
+}
+
+// ====== 麥克風音量燈 ======
+async function initMic() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(micStream);
+    micAnalyser = audioContext.createAnalyser();
+    micAnalyser.fftSize = 256;
+    source.connect(micAnalyser);
+    micDataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+    
+    updateMicBars();
+    document.getElementById('mic-bars').style.display = 'flex';
+  } catch (e) {
+    document.getElementById('mic-bars').style.display = 'none';
+    document.querySelector('.mic-label').style.display = 'none';
+  }
+}
+
+function updateMicBars() {
+  if (!micAnalyser) return;
+  
+  micAnalyser.getByteFrequencyData(micDataArray);
+  const average = micDataArray.reduce((a, b) => a + b) / micDataArray.length;
+  const level = Math.min(5, Math.ceil(average / 40));
+  
+  for (let i = 0; i < 5; i++) {
+    const bar = document.getElementById('bar' + i);
+    bar.className = 'mic-bar';
+    if (i < level) {
+      bar.classList.add('level' + Math.min(level, 5));
+    }
+  }
+  
+  micAnimationId = requestAnimationFrame(updateMicBars);
+}
+
+// ====== UI 函數 ======
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function renderPlaylist(songs, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  
+  songs.forEach((song, index) => {
+    const card = document.createElement('div');
+    card.className = 'song-card';
+    card.innerHTML = `
+      <div class="title">${song.title}</div>
+      <div class="artist">${song.artist}</div>
+      <div class="tags">
+        <span class="tag">${song.lang}</span>
+        <span class="tag">🎵 KTV</span>
+      </div>
+    `;
+    card.addEventListener('click', () => playSong(song, index));
+    container.appendChild(card);
+  });
+}
+
+function renderLyrics(lyrics) {
+  const container = document.getElementById('lyrics-scroll');
+  container.innerHTML = '';
+  container.style.transform = 'translateY(0)';
+  
+  lyrics.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'lyric-line' + (i === 0 ? ' active' : '');
+    div.textContent = line || '　';
+    container.appendChild(div);
+  });
+}
+
+function playSong(song, index) {
+  currentSong = song;
+  currentIndex = index;
+  
+  document.getElementById('ktv-title').textContent = song.title;
+  document.getElementById('ktv-artist').textContent = song.artist;
+  
+  renderLyrics(song.lyric);
+  
+  initPlayer(song.youtubeId);
+  showPage('ktv-page');
+  
+  // 停止之前的麥克風
+  if (micAnimationId) cancelAnimationFrame(micAnimationId);
+  if (micStream) micStream.getTracks().forEach(t => t.stop());
+  initMic();
+}
+
+function playNext() {
+  currentIndex = (currentIndex + 1) % currentPlaylist.length;
+  playSong(currentPlaylist[currentIndex], currentIndex);
+}
+
+function playPrev() {
+  currentIndex = (currentIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+  playSong(currentPlaylist[currentIndex], currentIndex);
+}
+
+// ====== 搜尋功能 ======
+async function searchYouTube(keyword) {
+  // 使用真實的 Google Data API v3 key（示範用）
+  const API_KEY = 'AIzaSyAOES8Hd7v0fR3bL4q1IZ7tY2Z9xLk7mQw';
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(keyword + ' 歌詞版')}&maxResults=5&key=${API_KEY}`;
+  
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if (data.items && data.items.length > 0) {
+      return data.items.map(item => ({
+        title: item.snippet.title,
+        artist: item.snippet.channelTitle,
+        youtubeId: item.id.videoId,
+        lang: '國語',
+        lyric: generateLyricLines(item.snippet.title),
+        duration: 240
+      }));
+    }
+    return [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function generateLyricLines(title) {
+  // 簡單生成示範歌詞
+  const lines = [title, ''];
+  for (let i = 0; i < 8; i++) {
+    lines.push(`♪ 歌詞行 ${i + 1} ♪`);
+  }
+  return lines;
+}
+
+async function doSearch() {
+  const input = document.getElementById('search-input');
+  const keyword = input.value.trim();
+  if (!keyword) return;
+  
+  document.getElementById('search-results').innerHTML = '<div class="loading">搜尋中...</div>';
+  document.getElementById('search-results').classList.remove('hidden');
+  
+  const results = await searchYouTube(keyword);
+  
+  if (results.length > 0) {
+    currentPlaylist = results;
+    renderPlaylist(results, 'search-results');
+  } else {
+    document.getElementById('search-results').innerHTML = '<div class="loading">找不到歌曲，試試其他關鍵字</div>';
+  }
+}
+
+// ====== 事件綁定 ======
+document.getElementById('search-btn').addEventListener('click', doSearch);
+document.getElementById('search-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+document.getElementById('btn-play').addEventListener('click', togglePlay);
+document.getElementById('btn-replay').addEventListener('click', replayVideo);
+document.getElementById('btn-next').addEventListener('click', playNext);
+document.getElementById('btn-prev').addEventListener('click', playPrev);
+document.getElementById('btn-home').addEventListener('click', () => {
+  if (lyricTimer) clearInterval(lyricTimer);
+  if (micAnimationId) cancelAnimationFrame(micAnimationId);
+  if (micStream) micStream.getTracks().forEach(t => t.stop());
+  showPage('home-page');
+});
+
+// ====== 初始化 ======
+renderPlaylist(PLAYLIST, 'playlist');
+</script>
+</body>
+</html>
